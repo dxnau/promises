@@ -11,10 +11,25 @@
 var fs = require('fs');
 var Promise = require('bluebird');
 
+var helper = require('./promiseConstructor.js');
+var git = require('./promisification');
+
+// var writeFileAsync = Promise.promisify(fs.writeFile);
+Promise.promisifyAll(fs);
+// Promisifies all 'fs' functions and gives us an `Async` suffixed version
+// For example - `fs.readFileAsync`, `fs.writeFileAsync`
 
 
 var fetchProfileAndWriteToFile = function(readFilePath, writeFilePath) {
-  // TODO
+  return helper.pluckFirstLineFromFileAsync(readFilePath)
+  .then(function(username){
+    return git.getGitHubProfileAsync(username)
+  })
+  .then(function(jsonResponse){
+    console.log('!!!!!!!!!!!!!!', jsonResponse)
+    return fs.writeFileAsync(writeFilePath, JSON.stringify(jsonResponse))
+  })
+
 };
 
 // Export these functions so we can test them
